@@ -140,38 +140,49 @@
 <script>
 (function() {
   const container = document.getElementById('reportList');
-  const currentFile = location.pathname.split('/').pop() || 'index.html';
+  const API = 'https://api.github.com/repos/youxiaohanpian/githubweekly/contents/';
 
-  fetch('./')
+  fetch(API)
     .then(res => {
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.text();
+      if (!res.ok) {
+        if (res.status === 403) {
+          throw new Error('API 请求被限流（403），请稍后重试');
+        }
+        throw new Error('请求失败：HTTP ' + res.status);
+      }
+      return res.json();
     })
-    .then(html => {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      const links = doc.querySelectorAll('a');
-      const reports = [];
+    .then(data => {
+      if (!Array.isArray(data)) {
+        throw new Error('API 返回数据格式异常');
+      }
 
-      links.forEach(a => {
-        const href = a.getAttribute('href');
-        if (!href) return;
+      const reports = [];
+      const monthNames = ['1月','2月','3月','4月','5月','6月',
+                          '7月','8月','9月','10月','11月','12月'];
+      const weekDays = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+
+      data.forEach(file => {
         // 只匹配 github-ai-trending-YYYYMMDD.html
-        const match = href.match(/^github-ai-trending-(\d{8})\.html$/);
+        const match = file.name.match(/^github-ai-trending-(\d{8})\.html$/);
         if (!match) return;
+
         const dateStr = match[1];
         const year = dateStr.slice(0, 4);
         const month = dateStr.slice(4, 6);
         const day = dateStr.slice(6, 8);
         const dateObj = new Date(year, month - 1, day);
         const isoStr = `${year}-${month}-${day}`;
-        const monthNames = ['1月','2月','3月','4月','5月','6月',
-                            '7月','8月','9月','10月','11月','12月'];
-        const weekDays = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
         const weekDay = weekDays[dateObj.getDay()];
         const display = `${year}年${monthNames[parseInt(month)-1]}${parseInt(day)}日 ${weekDay}`;
 
-        reports.push({ href, isoStr, display, month: monthNames[parseInt(month)-1], day: parseInt(day) });
+        reports.push({
+          href: file.name,
+          isoStr,
+          display,
+          month: monthNames[parseInt(month)-1],
+          day: parseInt(day)
+        });
       });
 
       reports.sort((a, b) => b.isoStr.localeCompare(a.isoStr));
