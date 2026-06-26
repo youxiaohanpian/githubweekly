@@ -129,87 +129,33 @@
     <h1>GitHub AI Trending 报告</h1>
     <p>自动归档 · 每周 AI 领域热门项目追踪</p>
   </header>
-  <div id="reportList" class="report-list">
-    <div class="loading">正在加载报告列表…</div>
+  <div class="report-list">
+    <a class="report-card" href="github-ai-trending-20260625.html" target="_blank">
+      <div class="date-badge">
+        <span class="month">6月</span>
+        <span class="day">25</span>
+      </div>
+      <div class="report-info">
+        <div class="report-title">GitHub AI Trending 日报</div>
+        <div class="report-date">2026年6月25日 星期四</div>
+      </div>
+      <span class="arrow">→</span>
+    </a>
+    <a class="report-card" href="github-ai-trending-20260611.html" target="_blank">
+      <div class="date-badge">
+        <span class="month">6月</span>
+        <span class="day">11</span>
+      </div>
+      <div class="report-info">
+        <div class="report-title">GitHub AI Trending 日报</div>
+        <div class="report-date">2026年6月11日 星期三</div>
+      </div>
+      <span class="arrow">→</span>
+    </a>
   </div>
   <footer>
     Powered by GitHub Actions · Auto-generated weekly
   </footer>
 </div>
-
-<script>
-(function() {
-  const container = document.getElementById('reportList');
-  const API = 'https://api.github.com/repos/youxiaohanpian/githubweekly/contents/';
-
-  fetch(API)
-    .then(res => {
-      if (!res.ok) {
-        if (res.status === 403) {
-          throw new Error('API 请求被限流（403），请稍后重试');
-        }
-        throw new Error('请求失败：HTTP ' + res.status);
-      }
-      return res.json();
-    })
-    .then(data => {
-      if (!Array.isArray(data)) {
-        throw new Error('API 返回数据格式异常');
-      }
-
-      const reports = [];
-      const monthNames = ['1月','2月','3月','4月','5月','6月',
-                          '7月','8月','9月','10月','11月','12月'];
-      const weekDays = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
-
-      data.forEach(file => {
-        // 只匹配 github-ai-trending-YYYYMMDD.html
-        const match = file.name.match(/^github-ai-trending-(\d{8})\.html$/);
-        if (!match) return;
-
-        const dateStr = match[1];
-        const year = dateStr.slice(0, 4);
-        const month = dateStr.slice(4, 6);
-        const day = dateStr.slice(6, 8);
-        const dateObj = new Date(year, month - 1, day);
-        const isoStr = `${year}-${month}-${day}`;
-        const weekDay = weekDays[dateObj.getDay()];
-        const display = `${year}年${monthNames[parseInt(month)-1]}${parseInt(day)}日 ${weekDay}`;
-
-        reports.push({
-          href: file.name,
-          isoStr,
-          display,
-          month: monthNames[parseInt(month)-1],
-          day: parseInt(day)
-        });
-      });
-
-      reports.sort((a, b) => b.isoStr.localeCompare(a.isoStr));
-
-      if (reports.length === 0) {
-        container.innerHTML = '<div class="empty">暂无报告</div>';
-        return;
-      }
-
-      container.innerHTML = reports.map(r => `
-        <a class="report-card" href="${r.href}" target="_blank">
-          <div class="date-badge">
-            <span class="month">${r.month}</span>
-            <span class="day">${r.day}</span>
-          </div>
-          <div class="report-info">
-            <div class="report-title">GitHub AI Trending 日报</div>
-            <div class="report-date">${r.display}</div>
-          </div>
-          <span class="arrow">→</span>
-        </a>
-      `).join('');
-    })
-    .catch(err => {
-      container.innerHTML = '<div class="empty">加载失败：' + err.message + '</div>';
-    });
-})();
-</script>
 </body>
 </html>
