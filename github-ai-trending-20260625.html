@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Trending · AI/ML 周榜 · 2026-06-25</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(160deg, #0A3D40 0%, #0C2B35 30%, #0A1628 60%, #0D1B2A 100%);
+    background-attachment: fixed;
+    color: #E2E8F0;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* 微妙网格纹理 */
+  body::before {
+    content: '';
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none; z-index: 0;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; padding: 60px 24px 40px; position: relative; z-index: 1; }
+
+  /* 顶部 */
+  .header { text-align: center; margin-bottom: 48px; }
+  .header .badge {
+    display: inline-block; padding: 5px 16px; border-radius: 20px;
+    background: rgba(13, 148, 136, 0.15); border: 1px solid rgba(13, 148, 136, 0.25);
+    font-size: 13px; color: #5EEAD4; letter-spacing: 0.5px; margin-bottom: 16px;
+  }
+  .header h1 {
+    font-size: 36px; font-weight: 700; letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #CCFBF1 0%, #5EEAD4 50%, #2DD4BF 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom: 12px;
+  }
+  .header .subtitle { font-size: 15px; color: #94A3B8; }
+  .header .fetch-time { font-size: 13px; color: #64748B; margin-top: 6px; }
+
+  /* 趋势总结 */
+  .trend-summary {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px; padding: 20px 24px; margin-bottom: 40px;
+    backdrop-filter: blur(12px);
+  }
+  .trend-summary p { font-size: 14px; color: #CBD5E1; line-height: 1.8; }
+  .trend-summary strong { color: #5EEAD4; font-weight: 600; }
+
+  /* 卡片列表 */
+  .card-list { display: flex; flex-direction: column; gap: 16px; }
+
+  .card {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px; padding: 24px 28px;
+    backdrop-filter: blur(12px);
+    transition: border-color 0.25s, background 0.25s, transform 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .card:hover {
+    border-color: rgba(13, 148, 136, 0.3); background: rgba(255,255,255,0.05);
+    transform: translateY(-1px);
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+    background: linear-gradient(180deg, #0D9488 0%, #14B8A6 100%);
+  }
+
+  .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+
+  .rank { font-size: 18px; font-weight: 700; color: #5EEAD4; min-width: 28px; }
+
+  .project-name {
+    font-size: 17px; font-weight: 600; color: #F1F5F9;
+    text-decoration: none; transition: color 0.2s;
+  }
+  .project-name:hover { color: #5EEAD4; }
+
+  .lang-tag {
+    font-size: 11px; padding: 2px 10px; border-radius: 10px;
+    background: rgba(13, 148, 136, 0.15); color: #5EEAD4;
+    font-weight: 500; letter-spacing: 0.3px;
+  }
+
+  .star-info { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .star-total { font-size: 14px; color: #94A3B8; }
+  .star-total span { color: #CBD5E1; font-weight: 600; }
+  .star-weekly {
+    font-size: 14px; color: #FBBF24; font-weight: 600;
+    background: rgba(251, 191, 36, 0.1); padding: 2px 10px; border-radius: 10px;
+  }
+
+  .one-liner { font-size: 14px; color: #94A3B8; margin-bottom: 14px; line-height: 1.6; }
+
+  .section-label { font-size: 11px; color: #64748B; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+
+  .features { list-style: none; margin-bottom: 14px; }
+  .features li { font-size: 13.5px; color: #CBD5E1; padding: 3px 0; padding-left: 16px; position: relative; }
+  .features li::before { content: '▸'; position: absolute; left: 0; color: #0D9488; font-size: 11px; top: 4px; }
+
+  .scenarios { display: flex; flex-wrap: wrap; gap: 8px; }
+  .scenario-tag {
+    font-size: 12px; padding: 3px 12px; border-radius: 6px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    color: #CBD5E1; transition: all 0.2s;
+  }
+  .scenario-tag:hover { border-color: rgba(13, 148, 136, 0.4); color: #5EEAD4; }
+
+  /* 底部 */
+  .footer {
+    text-align: center; padding: 40px 0 20px; font-size: 12px; color: #475569;
+  }
+  .footer a { color: #64748B; text-decoration: none; transition: color 0.2s; }
+  .footer a:hover { color: #5EEAD4; }
+  .footer .divider { margin: 0 8px; color: #334155; }
+
+  @media (max-width: 640px) {
+    .container { padding: 32px 16px 24px; }
+    .header h1 { font-size: 26px; }
+    .card { padding: 18px 20px; }
+    .card-header { gap: 8px; }
+    .star-info { margin-left: 0; margin-top: 4px; }
+    .project-name { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 顶部 -->
+  <div class="header">
+    <div class="badge">GitHub Trending Weekly</div>
+    <h1>AI / ML 开源项目周榜</h1>
+    <p class="subtitle">聚焦本周 AI 与机器学习领域最受关注的开源项目，按新增 Star 降序排列</p>
+    <p class="fetch-time">数据抓取时间：2026-06-25 星期四 · 统计周期：2026-06-16 ~ 2026-06-22</p>
+  </div>
+
+  <!-- 趋势总结 -->
+  <div class="trend-summary">
+    <p>
+      本周 AI 开源生态聚焦 <strong>Agent 基础设施</strong>与<strong>上下文工程</strong>两条主线——
+      Headroom 以近 1.5 万周增 Star 登顶，反映开发者对「降低 LLM Token 成本」的强烈诉求；
+      Agent-Reach、agent-skills、SkillSpector 等构建起「感知→技能→安全」的 Agent 工具链闭环；
+      TimesFM 为代表的时序基础模型持续升温，推理优化与智能体视频制作亦成新热点。
+    </p>
+  </div>
+
+  <!-- 卡片列表 -->
+  <div class="card-list">
+
+    <!-- 1. headroom -->
+    <div class="card">
+      <div class="card-header">
+        <span class="rank">01</span>
+        <a class="project-name" href="https://github.com/chopratejas/headroom" target="_blank" rel="noopener">chopratejas/headroom</a>
+        <span class="lang-tag">Python</span>
+        <div class="star-info">
+          <span class="star-total">⭐ <span>42.3k</span></span>
+          <span class="star-weekly">▲ 14,982</span>
+        </div>
+      </div>
+      <p class="one-liner">LLM 上下文压缩层——在工具输出、日志、文件、RAG 分块进入大模型之前智能压缩，节省 60-95% Token，答案质量不变。</p>
+      <div class="section-label">核心功能</div>
+      <ul class="features">
+        <li>6 种压缩算法智能路由：JSON 专用 SmartCrusher、AST 感知代码压缩、基于 ModernBERT 的文本压缩等</li>
+        <li>CCR 可逆压缩：原始数据不丢失，通过 Compress-Cache-Retrieve 在需要时完整取回</li>
+        <li>四种集成形态：Library / Proxy / Agent Wrap / MCP Server，零代码改动即可接入 Claude Code、Cursor 等主流工具</li>
+      </ul>
+      <div class="section-label">适用场景</div>
+      <div class="scenarios">
+        <span class="scenario-tag">AI 应用开发者</span>
+        <span class="scenario-tag">API 成本敏感用户</span>
+        <span class="scenario-tag">Agent 构建者</span>
+        <span class="scenario-tag">RAG 系统优化</span>
+      </div>
+    </div>
+
+    <!-- 2. Agent-Reach -->
+    <div class="card">
+      <div class="card-header">
+        <span class="rank">02</span>
+        <a class="project-name" href="https://github.com/Panniantong/Agent-Reach" target="_blank" rel="noopener">Panniantong/Agent-Reach</a>
+        <span class="lang-tag">Python</span>
+        <div class="star-info">
+          <span class="star-total">⭐ <span>36.1k</span></span>
+          <span class="star-weekly">▲ 8,483</span>
+        </div>
+      </div>
+      <p class="one-liner">赋予 AI Agent「全网视觉」——一行 CLI 即可让 Agent 读取并搜索 Twitter、Reddit、YouTube、GitHub、Bilibili、小红书，零 API 费用。</p>
+      <div class="section-label">核心功能</div>
+      <ul class="features">
+        <li>跨平台统一搜索接口：覆盖 6+ 主流社交与内容平台，无需申请各平台 API Key</li>
+        <li>CLI 原生集成：通过命令行直接与 AI 编程助手（Claude Code、Cursor 等）协同工作</li>
+        <li>结构化输出：搜索结果以 Agent 友好格式返回，便于下游分析链路消费</li>
+      </ul>
+      <div class="section-label">适用场景</div>
+      <div class="scenarios">
+        <span class="scenario-tag">信息聚合 Agent</span>
+        <span class="scenario-tag">舆情监控</span>
+        <span class="scenario-tag">竞品调研</span>
+        <span class="scenario-tag">内容创作者</span>
+      </div>
+    </div>
+
+    <!-- 3. agent-skills -->
+    <div class="card">
+      <div class="card-header">
+        <span class="rank">03</span>
+        <a class="project-name" href="https://github.com/addyosmani/agent-skills" target="_blank" rel="noopener">addyosmani/agent-skills</a>
+        <span class="lang-tag">JavaScript</span>
+        <div class="star-info">
+          <span class="star-total">⭐ <span>64.3k</span></span>
+          <span class="star-weekly">▲ 6,332</span>
+        </div>
+      </div>
+      <p class="one-liner">生产级 AI 编码 Agent 工程技能集——由 Google 工程师 Addy Osmani 维护，覆盖代码审查、测试策略、安全审计、文档生成等标准化技能模板。</p>
+      <div class="section-label">核心功能</div>
+      <ul class="features">
+        <li>开箱即用的技能模板：代码审查规范、依赖更新流程、安全漏洞检查、自动文档生成等</li>
+        <li>多平台兼容：Claude Code、Cursor、Copilot、Windsurf 等主流 AI 编程工具均可使用</li>
+        <li>Fork 即用：每个技能为标准化配置文件，按团队规范微调即可复用，降低从零定义规则的投入</li>
+      </ul>
+      <div class="section-label">适用场景</div>
+      <div class="scenarios">
+        <span class="scenario-tag">工程负责人</span>
+        <span class="scenario-tag">团队规范建设</span>
+        <span class="scenario-tag">AI 辅助开发</span>
+        <span class="scenario-tag">代码质量提升</span>
+      </div>
+    </div>
+
+    <!-- 4. Understand-Anything -->
+    <div class="card">
+      <div class="card-header">
+        <span class="rank">04</span>
+        <a class="project-name" href="https://github.com/Lum1104/Understand-Anything" target="_blank" rel="noopener">Lum1104/Understand-Anything</a>
+        <span class="lang-tag">TypeScript</span>
+        <div class="star-info">
+          <span class="star-total">⭐ <span>64.5k</span></span>
+          <span class="star-weekly">▲ 6,027</span>
+        </div>
+      </div>
+      <p class="one-liner">将任意代码库转化为可探索、可搜索、可问答的交互式知识图谱——让人类开发者和 AI Agent 都能快速理解代码结构。</p>
+      <div class="section-label">核心功能</div>
+      <ul class="features">
+        <li>代码库知识图谱化：自动扫描导入关系、模块依赖、配置关联，生成持久化图谱制品</li>
+        <li>语义搜索与问答：在可视化图谱中直接搜索并提问，无需通读源文件</li>
+        <li>多编码 Agent 原生兼容：Claude Code、Cursor、Copilot、Gemini CLI 等均可直接消费图谱</li>
+      </ul>
+      <div class="section-label">适用场景</div>
+      <div class="scenarios">
+        <span class="scenario-tag">新成员入职</span>
+        <span class="scenario-tag">遗留系统维护</span>
+        <span class="scenario-tag">代码审查</span>
+        <span class="scenario-tag">架构理解</span>
+      </div>
+    </div>
+
+    <!-- 5. codebase-memory-mcp -->
+    <div class="card">
+      <div class="card-header">
+        <span class="rank">05</span>
+        <a class="project-name" href="https://github.com/DeusData/codebase-memory-mcp" target="_blank" rel="noopener">DeusData/codebase-memory-mcp</a>
+        <span class="lang-tag">C</span>
+        <div class="star-info">
+          <span class="star-total">⭐ <span>9.6k</span></span>
+          <span class="star-weekly">▲ 5,419</span>
+        </div>
+      </div>
+      <p class="one-liner">高性能代码情报 MCP 服务器——毫秒级索引任意代码库为持久化知识图谱，支持 158 种语言，节省 99% Token 消耗，单二进制零依赖。</p>
+      <div class="section-label">核心功能</div>
+      <ul class="features">
+        <li>极致性能：平均仓库毫秒级索引，亚毫秒级查询，单静态二进制无外部依赖</li>
+        <li>158 种语言支持：覆盖主流及小众编程语言的代码结构分析</li>
+        <li>持久化知识图谱：索引结果可复用，避免每次会话重复解析</li>
+      </ul>
+      <div class="section-label">适用场景</div>
+      <div class="scenarios">
+        <span class="scenario-tag">大型代码库检索</span>
+        <span class="scenario-tag">AI 编程 Agent</span>
+        <span class="scenario-tag">代码智能分析</span>
+        <span class="scenario-tag">DevOps 工具链</span>
+      </div>
+    </div>
+
+    <!-- 6. SkillSpector -->
+    <div class="card">
+      <div class="card-header">
+        <span class="rank">06</span>
+        <a class="project-name" href="https://github.com/NVIDIA/SkillSpector" target="_blank" rel="noopener">NVIDIA/SkillSpector</a>
+        <span class="lang-tag">Python</span>
+        <div class="star-info">
+          <span class="star-total">⭐ <span>8.8k</span></span>
+          <span class="star-weekly">▲ 4,631</span>
+        </div>
+      </div>
+      <p class="one-liner">AI Agent Skill 安全扫描器——检测漏洞、恶意模式与安全风险，由 NVIDIA 官方维护，是 Agent 生态安全治理的必备工具。</p>
+      <div class="section-label">核心功能</div>
+      <ul class="features">
+        <li>多维度安全检测：覆盖 MITRE ATT&CK、NIST CSF 2.0、MITRE ATLAS 等 6 大安全框架</li>
+        <li>Agent Skill 专项审计：针对 AI 编码 Agent 的技能脚本进行恶意模式与漏洞扫描</li>
+        <li>20+ 平台兼容：支持 Claude Code、Copilot、Cursor、Gemini CLI 等主流平台</li>
+      </ul>
+      <div class="section-label">适用场景</div>
+      <div class="scenarios">
+        <span class="scenario-tag">安全工程师</span>
+        <span class="scenario-tag">企业 Agent 落地审计</span>
+        <span class="scenario-tag">Skill 市场安全审查</span>
+        <span class="scenario-tag">合规团队</span>
+      </div>
+    </div>
+
+    <!-- 7. timesfm -->
+    <div class="card">
+      <div class="card-header">
+        <span class="rank">07</span>
+        <a class="project-name" href="https://github.com/google-research/timesfm" target="_blank" rel="noopener">google-research/timesfm</a>
+        <span class="lang-tag">Python</span>
+        <div class="star-info">
+          <span class="star-total">⭐ <span>24.6k</span></span>
+          <span class="star-weekly">▲ 3,655</span>
+        </div>
+      </div>
+      <p class="one-liner">Google Research 开发的时序基础模型（Time Series Foundation Model）——为时间序列预测提供预训练能力，开箱即用。</p>
+      <div class="section-label">核心功能</div>
+      <ul class="features">
+        <li>预训练时序模型：无需从零训练，直接用于销售、流量、能耗等时间序列预测任务</li>
+        <li>多粒度支持：兼容不同频率（小时、日、周、月）的时间序列输入</li>
+        <li>概率预测输出：提供点预测与置信区间，便于风险评估与决策</li>
+      </ul>
+      <div class="section-label">适用场景</div>
+      <div class="scenarios">
+        <span class="scenario-tag">数据科学家</span>
+        <span class="scenario-tag">销量预测</span>
+        <span class="scenario-tag">流量预估</span>
+        <span class="scenario-tag">能耗管理</span>
+      </div>
+    </div>
+
+    <!-- 8. MoneyPrinterTurbo -->
+    <div class="card">
+      <div class="card-header">
+        <span class="rank">08</span>
+        <a class="project-name" href="https://github.com/harry0703/MoneyPrinterTurbo" target="_blank" rel="noopener">harry0703/MoneyPrinterTurbo</a>
+        <span class="lang-tag">Python</span>
+        <div class="star-info">
+          <span class="star-total">⭐ <span>90.7k</span></span>
+          <span class="star-weekly">▲ 2,514</span>
+        </div>
+      </div>
+      <p class="one-liner">利用 AI 大模型一键生成高清短视频——输入主题即可自动完成文案、配音、画面匹配与合成，个人内容创作者的效率利器。</p>
+      <div class="section-label">核心功能</div>
+      <ul class="features">
+        <li>全自动视频流水线：从文案生成、配音合成到画面匹配、字幕渲染全流程自动化</li>
+        <li>多模型支持：兼容 OpenAI、Azure、本地模型等多种 LLM 后端</li>
+        <li>自定义模板：支持竖屏/横屏、多种字幕样式与画面风格配置</li>
+      </ul>
+      <div class="section-label">适用场景</div>
+      <div class="scenarios">
+        <span class="scenario-tag">短视频创作者</span>
+        <span class="scenario-tag">自媒体运营</span>
+        <span class="scenario-tag">营销内容生产</span>
+        <span class="scenario-tag">个人副业</span>
+      </div>
+    </div>
+
+    <!-- 9. rtk -->
+    <div class="card">
+      <div class="card-header">
+        <span class="rank">09</span>
+        <a class="project-name" href="https://github.com/rtk-ai/rtk" target="_blank" rel="noopener">rtk-ai/rtk</a>
+        <span class="lang-tag">Rust</span>
+        <div class="star-info">
+          <span class="star-total">⭐ <span>64.5k</span></span>
+          <span class="star-weekly">▲ 1,968</span>
+        </div>
+      </div>
+      <p class="one-liner">CLI 代理层，自动压缩常见开发命令的 LLM Token 消耗 60-90%——单 Rust 二进制，零依赖，直接提速 AI 编程工作流。</p>
+      <div class="section-label">核心功能</div>
+      <ul class="features">
+        <li>命令输出智能压缩：针对 ls、git diff、npm install 等常见开发命令的输出进行无损压缩</li>
+        <li>极致轻量：单一 Rust 编译的静态二进制，无运行时依赖，启动瞬间完成</li>
+        <li>透明代理：插入 AI 编程助手与 Shell 之间，无需修改任何工作流</li>
+      </ul>
+      <div class="section-label">适用场景</div>
+      <div class="scenarios">
+        <span class="scenario-tag">日常开发者</span>
+        <span class="scenario-tag">Token 成本优化</span>
+        <span class="scenario-tag">AI 编程助手提速</span>
+        <span class="scenario-tag">Shell 工作流</span>
+      </div>
+    </div>
+
+    <!-- 10. OpenMontage -->
+    <div class="card">
+      <div class="card-header">
+        <span class="rank">10</span>
+        <a class="project-name" href="https://github.com/calesthio/OpenMontage" target="_blank" rel="noopener">calesthio/OpenMontage</a>
+        <span class="lang-tag">Python</span>
+        <div class="star-info">
+          <span class="star-total">⭐ <span>6.9k</span></span>
+          <span class="star-weekly">▲ 1,700</span>
+        </div>
+      </div>
+      <p class="one-liner">全球首个开源 Agentic 视频制作系统——将 AI 编程助手变成完整视频工作室，从调研、脚本、素材生成到剪辑渲染全流程自动化。</p>
+      <div class="section-label">核心功能</div>
+      <ul class="features">
+        <li>12 条生产流水线 + 52 款工具：覆盖动画短片、产品广告、纪录片剪辑等多种视频类型</li>
+        <li>多供应商接入：支持 Veo、Kling、FLUX、ElevenLabs、Suno 等十多个 AI 服务</li>
+        <li>质量门禁：自动检测黑帧、音频电平、字幕完整性，渲染后自检输出质量</li>
+      </ul>
+      <div class="section-label">适用场景</div>
+      <div class="scenarios">
+        <span class="scenario-tag">内容创作者</span>
+        <span class="scenario-tag">独立电影人</span>
+        <span class="scenario-tag">AI 视频实验</span>
+        <span class="scenario-tag">低成本视频生产</span>
+      </div>
+    </div>
+
+  </div><!-- .card-list -->
+
+  <!-- 底部 -->
+  <div class="footer">
+    数据来源：<a href="https://github.com/trending?since=weekly" target="_blank" rel="noopener">GitHub Trending (Weekly)</a>
+    <span class="divider">|</span>
+    补充参考：<a href="https://github.com/OpenGithubs/github-weekly-rank" target="_blank" rel="noopener">OpenGithubs 周榜</a>
+    <span class="divider">|</span>
+    更新频率：每周四
+    <br>
+    <span style="margin-top: 8px; display: inline-block;">页面生成于 2026-06-25 · 主题色：深翡翠绿</span>
+  </div>
+
+</div>
+</body>
+</html>
