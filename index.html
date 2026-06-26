@@ -133,7 +133,7 @@
     <div class="loading">正在加载报告列表…</div>
   </div>
   <footer>
-    Powered by GitHub Actions · Auto-generated daily
+    Powered by GitHub Actions · Auto-generated weekly
   </footer>
 </div>
 
@@ -193,7 +193,7 @@
       }
 
       container.innerHTML = reports.map(r => `
-        <a class="report-card" href="${r.href}">
+        <a class="report-card" href="${r.href}" target="_blank">
           <div class="date-badge">
             <span class="month">${r.month}</span>
             <span class="day">${r.day}</span>
